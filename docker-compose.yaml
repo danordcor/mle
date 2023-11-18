@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  prediction-app:
+    image: prediction-app:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+
+  jupyter-notebook:
+    image: jupyter/datascience-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./challenge:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./requirements-dev.txt:/home/jovyan/requirements-dev.txt
+    command: "bash -c 'pip install -r /home/jovyan/requirements-dev.txt && start-notebook.sh'"
