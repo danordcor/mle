@@ -8,9 +8,9 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPO_ID: pass
-  ECS_CLUSTER_NAME: pass
-  ECS_SERVICE_NAME: pass
+  ECR_REPO_ID: 620593188645
+  ECS_CLUSTER_NAME: PredictionCluster
+  ECS_SERVICE_NAME: prediction-service
 
 jobs:
   test:
