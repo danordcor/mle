@@ -2,6 +2,7 @@
 FROM python:3.11 AS main
 
 WORKDIR /app
+ENV PYTHONPATH=/app
 
 COPY ./challenge /app
 
