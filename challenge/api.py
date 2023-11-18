@@ -1,3 +1,6 @@
+import logging
+import time
+
 import fastapi
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
@@ -88,10 +91,22 @@ class FlightList(BaseModel):
 
 
 
-def predict_cached(df):
-    features = model.preprocess(df)
-    predictions = model.predict(features)
-    return predictions
+def predict(df: pd.DataFrame):
+    try:
+        start_time = time.time()
+
+        features = model.preprocess(df)
+        predictions = model.predict(features)
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        logging.info(f"Prediction completed in {execution_time:.4f} seconds.")
+        return predictions
+
+    except Exception as e:
+        logging.error(f"Error occurred during prediction: {e}")
+        raise
 
 
 @app.post("/predict", status_code=200)
@@ -99,7 +114,7 @@ def predict_cached(df):
 async def post_predict(data: FlightList) -> dict:
     try:
         df = pd.DataFrame([flight.dict() for flight in data.flights])
-        predictions = predict_cached(df)
+        predictions = predict(df)
         return {"predict": predictions}
     except Exception as e:
         return {"error": "An error occurred during prediction.", "detail": str(e)}

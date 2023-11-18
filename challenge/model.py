@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 import xgboost as xgb
+import logging
 
 from typing import Tuple, Union, List
 from datetime import datetime
@@ -33,10 +34,11 @@ class DelayModel:
             try:
                 if os.path.exists(MODEL_FILENAME):
                     self._model.load_model(MODEL_FILENAME)
+                    logging.info("Model loaded")
                 else:
                     raise FileNotFoundError(f"Model file {MODEL_FILENAME} not found.")
             except Exception as e:
-                print(f"Error loading model: {e}")
+                logging.error(f"Error loading model: {e}")
 
     @staticmethod
     def get_period_day(date):
@@ -159,8 +161,13 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
-        self._model.fit(features, target.values.ravel())
-        self._model.save_model(MODEL_FILENAME)
+        try:
+            self._model.fit(features, target.values.ravel())
+            self._model.save_model(MODEL_FILENAME)
+            logging.info("Model successfully trained and saved.")
+        except Exception as e:
+            logging.error(f"Error occurred during model training: {e}")
+            raise
 
     def predict(
         self,
