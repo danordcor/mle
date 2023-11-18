@@ -1,0 +1,27 @@
+name: 'Continuous Integration'
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # For manual execution while testing cicd
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Run tests with pytest
+        run: |
+          pytest
