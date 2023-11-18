@@ -15,4 +15,5 @@ CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
 FROM main as dev
 
 COPY requirements-test.txt /app/requirements-test.txt
+COPY ./tests /app/tests
 RUN pip install -r requirements-test.txt
