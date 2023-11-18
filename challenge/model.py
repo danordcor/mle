@@ -8,24 +8,35 @@ from typing import Tuple, Union, List
 from datetime import datetime
 
 
-MODEL_FILENAME = "model.xgb"
+MODEL_FILENAME = "/data/model.xgb"
 SCALE_POS_WEIGHT = 4.44
 THRESHOLD = 0.69
 
 
 class DelayModel:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(
         self
     ):
-        self._model = xgb.XGBClassifier(random_state=1, learning_rate=0.01, scale_pos_weight=SCALE_POS_WEIGHT)
-        try:
-            if os.path.exists(MODEL_FILENAME):
-                self._model.load_model(MODEL_FILENAME)
-            else:
-                raise FileNotFoundError(f"Model file {MODEL_FILENAME} not found.")
-        except Exception as e:
-            print(f"Error loading model: {e}")
+        if not hasattr(self, '_model'):
+            self._model = xgb.XGBClassifier(
+                random_state=1,
+                learning_rate=0.01,
+                scale_pos_weight=SCALE_POS_WEIGHT
+            )
+            try:
+                if os.path.exists(MODEL_FILENAME):
+                    self._model.load_model(MODEL_FILENAME)
+                else:
+                    raise FileNotFoundError(f"Model file {MODEL_FILENAME} not found.")
+            except Exception as e:
+                print(f"Error loading model: {e}")
 
     @staticmethod
     def get_period_day(date):
@@ -106,11 +117,12 @@ class DelayModel:
             "OPERA_Sky Airline",
             "OPERA_Copa Air"
         ]
-        data['period_day'] = data['Fecha-I'].apply(self.get_period_day)
-        data['high_season'] = data['Fecha-I'].apply(self.is_high_season)
-        data['min_diff'] = data.apply(self.get_min_diff, axis=1)
-        threshold_in_minutes = 15
-        data['delay'] = np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
+        if ('Fecha-O' in data.columns):
+            data['period_day'] = data['Fecha-I'].apply(self.get_period_day)
+            data['high_season'] = data['Fecha-I'].apply(self.is_high_season)
+            data['min_diff'] = data.apply(self.get_min_diff, axis=1)
+            threshold_in_minutes = 15
+            data['delay'] = np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
 
         # Get dummy variables for specific columns
         opera_dummies = pd.get_dummies(data['OPERA'], prefix='OPERA')
