@@ -7,8 +7,11 @@ from typing import List
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi_cache.decorator import cache
+try:
 
-from .model import DelayModel
+    from model import DelayModel
+except Exception:
+    from .model import DelayModel
 
 app = fastapi.FastAPI()
 cache_backend = InMemoryBackend()
