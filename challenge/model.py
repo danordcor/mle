@@ -8,7 +8,7 @@ from typing import Tuple, Union, List
 from datetime import datetime
 
 
-MODEL_FILENAME = "/data/model.xgb"
+MODEL_FILENAME = "../data/model.xgb"
 SCALE_POS_WEIGHT = 4.44
 THRESHOLD = 0.69
 
